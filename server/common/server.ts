@@ -6,7 +6,7 @@ import http from 'http';
 import os from 'os';
 import cookieParser from 'cookie-parser';
 
-  import installValidator from './openapi';
+import installValidator from './openapi';
 
 import l from './logger';
 
