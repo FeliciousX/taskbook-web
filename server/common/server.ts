@@ -10,26 +10,34 @@ import cookieParser from 'cookie-parser';
 
 import l from './logger';
 
-const app = express();
-
 export default class ExpressServer {
+
+  public app: Application;
+  private httpServer: http.Server;
+
   constructor() {
     const root = path.normalize(__dirname + '/../..');
-    app.set('appPath', root + 'client');
-    app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '100kb' }));
-    app.use(bodyParser.urlencoded({ extended: true, limit: process.env.REQUEST_LIMIT || '100kb' }));
-    app.use(cookieParser(process.env.SESSION_SECRET));
-    app.use(express.static(`${root}/public`));
+    this.app = express();
+    this.app.set('appPath', root + 'client');
+    this.app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '100kb' }));
+    this.app.use(bodyParser.urlencoded({ extended: true, limit: process.env.REQUEST_LIMIT || '100kb' }));
+    this.app.use(cookieParser(process.env.SESSION_SECRET));
+    this.app.use(express.static(`${root}/public`));
   }
 
   router(routes: (app: Application) => void): ExpressServer {
-    installValidator(app, routes)
+    installValidator(this.app, routes)
     return this;
   }
 
-  listen(p: string | number = process.env.PORT): Application {
+  listen(p: string | number = process.env.PORT): ExpressServer {
     const welcome = port => () => l.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname() } on port: ${port}}`);
-    http.createServer(app).listen(p, welcome(p));
-    return app;
+    this.httpServer = http.createServer(this.app).listen(p, welcome(p));
+    return this;
+  }
+
+  close(cb?: (err?: Error) => void): ExpressServer {
+    this.httpServer.close(cb);
+    return this;
   }
 }
