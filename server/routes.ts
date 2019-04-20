@@ -1,5 +1,8 @@
-import { Application } from 'express';
 import examplesRouter from './api/controllers/examples/router'
-export default function routes(app: Application): void {
+
+import { Application } from 'express';
+
+export function routes(app: Application): Application {
   app.use('/api/v1/examples', examplesRouter);
+  return app;
 };

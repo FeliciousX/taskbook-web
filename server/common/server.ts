@@ -1,43 +1,43 @@
-import express from 'express';
-import { Application } from 'express';
+import { task } from 'fp-ts/lib/Task';
+
 import path from 'path';
+import express from 'express';
 import bodyParser from 'body-parser';
-import http from 'http';
-import os from 'os';
 import cookieParser from 'cookie-parser';
 
-import installValidator from './openapi';
+import openApiValidator from './openapi';
+import { errorHandler }from './error.handler';
 
-import l from './logger';
+import { Application } from 'express';
+import { Task } from 'fp-ts/lib/Task';
 
-export default class ExpressServer {
+export function registerMiddlewares(app: Application): Task<Application> {
+  return task.of(app)
+    .ap(task.of(jsonRequestHandler))
+    .ap(task.of(urlencodedRequestHandler))
+    .ap(task.of(cookieParserHandler))
+    .ap(task.of(staticDirectoryHandler))
+    .ap(task.of(openApiValidator.install.bind(openApiValidator)))
+    .ap(task.of(errorHandler))
+}
 
-  public app: Application;
-  private httpServer: http.Server;
+function staticDirectoryHandler(app: Application): Application {
+  const root = path.normalize(__dirname + '/../..')
+  app.use(express.static(root + '/public'));
+  return app;
+}
 
-  constructor() {
-    const root = path.normalize(__dirname + '/../..');
-    this.app = express();
-    this.app.set('appPath', root + 'client');
-    this.app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '100kb' }));
-    this.app.use(bodyParser.urlencoded({ extended: true, limit: process.env.REQUEST_LIMIT || '100kb' }));
-    this.app.use(cookieParser(process.env.SESSION_SECRET));
-    this.app.use(express.static(`${root}/public`));
-  }
+function jsonRequestHandler(app: Application): Application {
+  app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '100kb' }));
+  return app;
+}
 
-  router(routes: (app: Application) => void): ExpressServer {
-    installValidator(this.app, routes)
-    return this;
-  }
+function urlencodedRequestHandler(app: Application): Application {
+  app.use(bodyParser.urlencoded({ extended: true, limit: process.env.REQUEST_LIMIT || '100kb' }));
+  return app;
+}
 
-  listen(p: string | number = process.env.PORT): ExpressServer {
-    const welcome = port => () => l.info(`up and running in ${process.env.NODE_ENV || 'development'} @: ${os.hostname() } on port: ${port}}`);
-    this.httpServer = http.createServer(this.app).listen(p, welcome(p));
-    return this;
-  }
-
-  close(cb?: (err?: Error) => void): ExpressServer {
-    this.httpServer.close(cb);
-    return this;
-  }
+function cookieParserHandler(app: Application): Application {
+  app.use(cookieParser(process.env.SESSION_SECRET));
+  return app;
 }
