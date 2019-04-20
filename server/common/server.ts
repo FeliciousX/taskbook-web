@@ -4,6 +4,7 @@ import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { logHandler } from './logger'
 
 import openApiValidator from './openapi';
 import { errorHandler }from './error.handler';
@@ -17,6 +18,7 @@ export function registerMiddlewares(app: Application): Task<Application> {
     .ap(task.of(urlencodedRequestHandler))
     .ap(task.of(cookieParserHandler))
     .ap(task.of(staticDirectoryHandler))
+    .ap(task.of(logHandler))
     .ap(task.of(openApiValidator.install.bind(openApiValidator)))
     .ap(task.of(errorHandler))
 }

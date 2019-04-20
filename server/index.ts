@@ -8,7 +8,6 @@ import express from 'express';
 import { registerMiddlewares } from './common/server';
 import { log } from './common/logger';
 
-
 import { routes } from './routes';
 
 import { Application } from 'express';
