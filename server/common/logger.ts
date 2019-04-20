@@ -1,7 +1,7 @@
-import expressPino from 'express-pino-logger';
-import pino from 'pino';
+import expressPino from 'express-pino-logger'
+import pino from 'pino'
 
-import { Application } from 'express';
+import { Application } from 'express'
 
 export const log = pino({
   name: process.env.APP_ID,
@@ -9,11 +9,11 @@ export const log = pino({
   prettyPrint: {
     levelFirst: true
   }
-});
+})
 
 export function logHandler(app: Application): Application {
   if (process.env.NODE_ENV !== 'test') {
-    app.use(expressPino({ logger: log }));
+    app.use(expressPino({ logger: log }))
   }
-  return app;
+  return app
 }

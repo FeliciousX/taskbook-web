@@ -1,19 +1,19 @@
-import Promise from 'bluebird';
+import Promise from 'bluebird'
 
-let id = 0;
+let id = 0
 interface Example {
-  id: number,
+  id: number
   name: string
-};
+}
 
 const examples: Example[] = [
-    { id: id++, name: 'example 0' }, 
-    { id: id++, name: 'example 1' }
-];
+  { id: id++, name: 'example 0' },
+  { id: id++, name: 'example 1' }
+]
 
 export class ExamplesService {
   all(): Promise<Example[]> {
-    return Promise.resolve(examples);
+    return Promise.resolve(examples)
   }
 
   byId(id: number): Promise<Example> {
@@ -24,10 +24,10 @@ export class ExamplesService {
     const example: Example = {
       id: id++,
       name
-    };
+    }
     examples.push(example)
-    return Promise.resolve(example);
+    return Promise.resolve(example)
   }
 }
 
-export default new ExamplesService();
+export default new ExamplesService()
