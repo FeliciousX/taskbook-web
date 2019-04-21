@@ -1,7 +1,7 @@
 import express from 'express'
-import controller from './controller'
-export default express
+import { create, all, byId } from './controller'
+export const examplesRouter = express
   .Router()
-  .post('/', controller.create)
-  .get('/', controller.all)
-  .get('/:id', controller.byId)
+  .post('/', create)
+  .get('/', all)
+  .get('/:id', byId)

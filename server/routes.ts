@@ -1,4 +1,4 @@
-import examplesRouter from './api/controllers/examples/router'
+import { examplesRouter } from './api/controllers/examples/router'
 
 import { Application } from 'express'
 
